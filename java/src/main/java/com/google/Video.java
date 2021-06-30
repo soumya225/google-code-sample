@@ -31,6 +31,7 @@ class Video implements Comparable<Video>{
     return tags;
   }
 
+  @Override
   public String toString() {
     StringBuilder tagsList = new StringBuilder();
     tagsList.append("[");

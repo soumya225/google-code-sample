@@ -1,5 +1,6 @@
 package com.google;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -7,11 +8,14 @@ import java.util.Random;
 public class VideoPlayer {
 
   private final VideoLibrary videoLibrary;
-  private Video currentlyPlaying = null;
+
+  private Video currentlyPlaying;
   private boolean isPaused;
+  private List<VideoPlaylist> playlists;
 
   public VideoPlayer() {
     this.videoLibrary = new VideoLibrary();
+    this.playlists = new ArrayList<>();
   }
 
   public void numberOfVideos() {
@@ -108,31 +112,146 @@ public class VideoPlayer {
   }
 
   public void createPlaylist(String playlistName) {
-    System.out.println("createPlaylist needs implementation");
+    boolean isUnique = !playlistExists(playlistName);
+
+    if(!isUnique) {
+      System.out.println("Cannot create playlist: A playlist with the same name already exists");
+    } else {
+      playlists.add(new VideoPlaylist(playlistName));
+      System.out.println("Successfully created new playlist: " + playlistName);
+    }
   }
 
   public void addVideoToPlaylist(String playlistName, String videoId) {
-    System.out.println("addVideoToPlaylist needs implementation");
+    Video videoToBeAdded = videoLibrary.getVideo(videoId);
+
+    VideoPlaylist playlistToAddTo = null;
+    boolean videoExistsInPlaylist = false;
+
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        playlistToAddTo = playlist;
+
+        //Check if video is already added in playlist
+        for(Video video: playlist.getVideos()) {
+          if(video.equals(videoToBeAdded)) {
+            System.out.println("Cannot add video to " + playlistName + ": Video already added");
+            videoExistsInPlaylist = true;
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    if(playlistToAddTo == null) {
+      System.out.println("Cannot add video to " + playlistName + ": Playlist does not exist");
+      return;
+    }
+
+    if(videoToBeAdded == null) {
+      System.out.println("Cannot add video to " + playlistName + ": Video does not exist");
+      return;
+    }
+
+    if(!videoExistsInPlaylist) {
+      playlistToAddTo.getVideos().add(videoToBeAdded);
+      System.out.println("Added video to " + playlistName + ": " + videoToBeAdded.getTitle());
+    }
   }
 
   public void showAllPlaylists() {
-    System.out.println("showAllPlaylists needs implementation");
+    if(playlists.size() == 0) {
+      System.out.println("No playlists exist yet");
+      return;
+    }
+
+    List<VideoPlaylist> sortedPlaylists = playlists;
+    Collections.sort(sortedPlaylists);
+
+    System.out.println("Showing all playlists:");
+    for(VideoPlaylist playlist: sortedPlaylists) {
+      System.out.println(playlist.getTitle());
+    }
   }
 
   public void showPlaylist(String playlistName) {
-    System.out.println("showPlaylist needs implementation");
+
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+
+        System.out.println("Showing playlist: " + playlistName);
+        if(playlist.getVideos().size() == 0) {
+          System.out.println("No videos here yet.");
+        }
+        for(Video video: playlist.getVideos()) {
+          System.out.println(video);
+        }
+        return;
+      }
+    }
+
+    System.out.println("Cannot show playlist " + playlistName + ": Playlist does not exist");
   }
 
   public void removeFromPlaylist(String playlistName, String videoId) {
-    System.out.println("removeFromPlaylist needs implementation");
+    Video videoToBeRemoved = videoLibrary.getVideo(videoId);
+
+    VideoPlaylist playlistToRemoveFrom = null;
+    boolean videoExistsInPlaylist = false;
+
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        playlistToRemoveFrom = playlist;
+
+        boolean removedVideo = playlist.getVideos().remove(videoToBeRemoved);
+        if(removedVideo) {
+          videoExistsInPlaylist = true;
+          System.out.println("Removed video from " + playlistName + ": " + videoToBeRemoved.getTitle());
+        }
+
+        break;
+      }
+    }
+
+    if(playlistToRemoveFrom == null) {
+      System.out.println("Cannot remove video from " + playlistName + ": Playlist does not exist");
+      return;
+    }
+
+    if(videoToBeRemoved == null) {
+      System.out.println("Cannot remove video from " + playlistName + ": Video does not exist");
+      return;
+    }
+
+    if(!videoExistsInPlaylist) {
+      System.out.println("Cannot remove video from " + playlistName + ": Video is not in playlist");
+    }
+
   }
 
   public void clearPlaylist(String playlistName) {
-    System.out.println("clearPlaylist needs implementation");
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        playlist.getVideos().clear();
+        System.out.println("Successfully removed all videos from " + playlistName);
+        return;
+      }
+    }
+    System.out.println("Cannot clear playlist " + playlistName + ": Playlist does not exist");
   }
 
   public void deletePlaylist(String playlistName) {
-    System.out.println("deletePlaylist needs implementation");
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        playlists.remove(playlistName);
+        System.out.println("Deleted playlist: " + playlistName);
+        return;
+      }
+    }
+
+    System.out.println("Cannot delete playlist " + playlistName + ": Playlist does not exist");
+
   }
 
   public void searchVideos(String searchTerm) {
@@ -153,5 +272,19 @@ public class VideoPlayer {
 
   public void allowVideo(String videoId) {
     System.out.println("allowVideo needs implementation");
+  }
+
+
+  private boolean playlistExists (String playlistName) {
+    boolean exists = false;
+
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        exists = true;
+        break;
+      }
+    }
+
+    return exists;
   }
 }
