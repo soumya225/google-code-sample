@@ -8,7 +8,7 @@ public class VideoPlayer {
 
   private Video currentlyPlaying;
   private boolean isPaused;
-  private List<VideoPlaylist> playlists;
+  private final List<VideoPlaylist> playlists;
 
   public VideoPlayer() {
     this.videoLibrary = new VideoLibrary();
@@ -115,7 +115,7 @@ public class VideoPlayer {
       return;
     }
 
-    String toPrint = "Currently playing: " + currentlyPlaying.toString();
+    String toPrint = "Currently playing: " + currentlyPlaying;
     if(isPaused) toPrint += " - PAUSED";
 
     System.out.println(toPrint);
@@ -270,7 +270,7 @@ public class VideoPlayer {
   public void deletePlaylist(String playlistName) {
     for(VideoPlaylist playlist: playlists) {
       if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
-        playlists.remove(playlistName);
+        playlists.remove(playlist);
         System.out.println("Deleted playlist: " + playlistName);
         return;
       }
@@ -306,9 +306,7 @@ public class VideoPlayer {
       Scanner in = new Scanner(System.in);
       int choice = in.nextInt();
       playVideo(matchingVideos.get(choice-1).getVideoId());
-    } catch (Exception e) {
-
-    }
+    } catch (Exception ignored) {}
   }
 
   public void searchVideosWithTag(String videoTag) {
@@ -337,9 +335,7 @@ public class VideoPlayer {
       Scanner in = new Scanner(System.in);
       int choice = in.nextInt();
       playVideo(matchingVideos.get(choice-1).getVideoId());
-    } catch (Exception e) {
-
-    }
+    } catch (Exception ignored) {}
   }
 
   public void flagVideo(String videoId) {
@@ -390,6 +386,6 @@ public class VideoPlayer {
     if(video.getFlag() != null) {
       builder.append(" - FLAGGED (reason: ").append(video.getFlag()).append(")");
     }
-    System.out.println(builder.toString());
+    System.out.println(builder);
   }
 }

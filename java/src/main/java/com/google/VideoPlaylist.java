@@ -5,8 +5,8 @@ import java.util.List;
 
 /** A class used to represent a Playlist */
 class VideoPlaylist implements Comparable<VideoPlaylist> {
-    private String title;
-    private List<Video> videos;
+    private final String title;
+    private final List<Video> videos;
 
     public VideoPlaylist(String title) {
         this.title = title;

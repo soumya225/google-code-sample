@@ -51,7 +51,7 @@ class Video implements Comparable<Video>{
     }
     tagsList.append("]");
 
-    return this.title + " (" + videoId + ") " + tagsList.toString();
+    return this.title + " (" + videoId + ") " + tagsList;
   }
 
   @Override
