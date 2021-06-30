@@ -1,9 +1,6 @@
 package com.google;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class VideoPlayer {
 
@@ -255,11 +252,65 @@ public class VideoPlayer {
   }
 
   public void searchVideos(String searchTerm) {
-    System.out.println("searchVideos needs implementation");
+    List<Video> matchingVideos = new ArrayList<>();
+
+    for(Video video: videoLibrary.getVideos()) {
+      if(video.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
+        matchingVideos.add(video);
+      }
+    }
+
+    if(matchingVideos.isEmpty()) {
+      System.out.println("No search results for " + searchTerm);
+      return;
+    }
+
+    System.out.println("Here are the results for " + searchTerm + ":");
+    Collections.sort(matchingVideos);
+    for(int i = 1; i <= matchingVideos.size(); i++) {
+      System.out.println("\t" + i + ") " + matchingVideos.get(i-1));
+    }
+    System.out.println("Would you like to play any of the above? If yes, specify the number of the video.\n" +
+            "If your answer is not a valid number, we will assume it's a no.");
+
+    try {
+      Scanner in = new Scanner(System.in);
+      int choice = in.nextInt();
+      playVideo(matchingVideos.get(choice-1).getVideoId());
+    } catch (Exception e) {
+
+    }
   }
 
   public void searchVideosWithTag(String videoTag) {
-    System.out.println("searchVideosWithTag needs implementation");
+    List<Video> matchingVideos = new ArrayList<>();
+
+    for(Video video: videoLibrary.getVideos()) {
+      if(video.getTags().contains(videoTag.toLowerCase())) {
+        matchingVideos.add(video);
+      }
+    }
+
+    if(matchingVideos.isEmpty()) {
+      System.out.println("No search results for " + videoTag);
+      return;
+    }
+
+    System.out.println("Here are the results for " + videoTag + ":");
+    Collections.sort(matchingVideos);
+    for(int i = 1; i <= matchingVideos.size(); i++) {
+      System.out.println("\t" + i + ") " + matchingVideos.get(i-1));
+    }
+    System.out.println("Would you like to play any of the above? If yes, specify the number of the video.\n" +
+            "If your answer is not a valid number, we will assume it's a no.");
+
+    try {
+      Scanner in = new Scanner(System.in);
+      int choice = in.nextInt();
+      playVideo(matchingVideos.get(choice-1).getVideoId());
+    } catch (Exception e) {
+
+    }
   }
 
   public void flagVideo(String videoId) {
