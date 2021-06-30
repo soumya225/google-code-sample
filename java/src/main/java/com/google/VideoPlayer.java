@@ -24,7 +24,7 @@ public class VideoPlayer {
     Collections.sort(sortedVideos);
     System.out.println("Here's a list of all available videos:");
     for(Video video: sortedVideos) {
-      System.out.println(video);
+      showVideo(video);
     }
   }
 
@@ -32,6 +32,10 @@ public class VideoPlayer {
     Video videoToPlay = videoLibrary.getVideo(videoId);
     if(videoToPlay == null) {
       System.out.println("Cannot play video: Video does not exist");
+      return;
+    }
+    if(videoToPlay.getFlag() != null) {
+      System.out.println("Cannot play video: Video is currently flagged (reason: " + videoToPlay.getFlag() +")");
       return;
     }
     if(currentlyPlaying != null) {
@@ -56,7 +60,16 @@ public class VideoPlayer {
   public void playRandomVideo() {
     int videoLibrarySize = videoLibrary.getVideos().size();
 
-    if(videoLibrarySize == 0) {
+    boolean isAllFlagged = true;
+
+    for(Video video: videoLibrary.getVideos()) {
+      if(video.getFlag() == null) {
+        isAllFlagged = false;
+        break;
+      }
+    }
+
+    if(videoLibrary.getVideos().isEmpty() || isAllFlagged) {
       System.out.println("No videos available");
       return;
     }
@@ -109,7 +122,14 @@ public class VideoPlayer {
   }
 
   public void createPlaylist(String playlistName) {
-    boolean isUnique = !playlistExists(playlistName);
+    boolean isUnique = true;
+
+    for(VideoPlaylist playlist: playlists) {
+      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
+        isUnique = false;
+        break;
+      }
+    }
 
     if(!isUnique) {
       System.out.println("Cannot create playlist: A playlist with the same name already exists");
@@ -128,6 +148,10 @@ public class VideoPlayer {
     for(VideoPlaylist playlist: playlists) {
       if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
         playlistToAddTo = playlist;
+
+        if(videoToBeAdded != null && videoToBeAdded.getFlag() != null) {
+          break;
+        }
 
         //Check if video is already added in playlist
         for(Video video: playlist.getVideos()) {
@@ -148,6 +172,11 @@ public class VideoPlayer {
 
     if(videoToBeAdded == null) {
       System.out.println("Cannot add video to " + playlistName + ": Video does not exist");
+      return;
+    }
+
+    if(videoToBeAdded.getFlag() != null) {
+      System.out.println("Cannot add video to " + playlistName + ": Video is currently flagged (reason: " +  videoToBeAdded.getFlag() +")");
       return;
     }
 
@@ -182,7 +211,7 @@ public class VideoPlayer {
           System.out.println("No videos here yet.");
         }
         for(Video video: playlist.getVideos()) {
-          System.out.println(video);
+          showVideo(video);
         }
         return;
       }
@@ -255,7 +284,7 @@ public class VideoPlayer {
     List<Video> matchingVideos = new ArrayList<>();
 
     for(Video video: videoLibrary.getVideos()) {
-      if(video.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
+      if(video.getFlag() == null && video.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
         matchingVideos.add(video);
       }
     }
@@ -286,7 +315,7 @@ public class VideoPlayer {
     List<Video> matchingVideos = new ArrayList<>();
 
     for(Video video: videoLibrary.getVideos()) {
-      if(video.getTags().contains(videoTag.toLowerCase())) {
+      if(video.getFlag() == null && video.getTags().contains(videoTag.toLowerCase())) {
         matchingVideos.add(video);
       }
     }
@@ -314,28 +343,53 @@ public class VideoPlayer {
   }
 
   public void flagVideo(String videoId) {
-    System.out.println("flagVideo needs implementation");
+    flagVideo(videoId, "Not supplied");
   }
 
   public void flagVideo(String videoId, String reason) {
-    System.out.println("flagVideo needs implementation");
+    Video videoToBeFlagged = videoLibrary.getVideo(videoId);
+    if (videoToBeFlagged == null) {
+      System.out.println("Cannot flag video: Video does not exist");
+      return;
+    }
+
+    if(videoToBeFlagged.getFlag() == null) {
+      if(currentlyPlaying != null && currentlyPlaying.equals(videoToBeFlagged)) {
+        stopVideo();
+      }
+
+      videoToBeFlagged.setFlag(reason);
+      System.out.println("Successfully flagged video: " + videoToBeFlagged.getTitle() + " (reason: " + reason + ")");
+    } else {
+      System.out.println("Cannot flag video: Video is already flagged");
+    }
+
   }
 
   public void allowVideo(String videoId) {
-    System.out.println("allowVideo needs implementation");
+    Video videoToBeUnFlagged = videoLibrary.getVideo(videoId);
+    if (videoToBeUnFlagged == null) {
+      System.out.println("Cannot remove flag from video: Video does not exist");
+      return;
+    }
+
+    if(videoToBeUnFlagged.getFlag() == null) {
+      System.out.println("Cannot remove flag from video: Video is not flagged");
+      return;
+    }
+
+    videoToBeUnFlagged.setFlag(null);
+    System.out.println("Successfully removed flag from video: " + videoToBeUnFlagged.getTitle());
+
   }
 
 
-  private boolean playlistExists (String playlistName) {
-    boolean exists = false;
-
-    for(VideoPlaylist playlist: playlists) {
-      if(playlist.getTitle().equalsIgnoreCase(playlistName)) {
-        exists = true;
-        break;
-      }
+  private void showVideo(Video video) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(video);
+    if(video.getFlag() != null) {
+      builder.append(" - FLAGGED (reason: ").append(video.getFlag()).append(")");
     }
-
-    return exists;
+    System.out.println(builder.toString());
   }
 }

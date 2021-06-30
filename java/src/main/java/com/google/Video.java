@@ -9,11 +9,13 @@ class Video implements Comparable<Video>{
   private final String title;
   private final String videoId;
   private final List<String> tags;
+  private String flag; //value of flag is null if video is not flagged
 
   Video(String title, String videoId, List<String> tags) {
     this.title = title;
     this.videoId = videoId;
     this.tags = Collections.unmodifiableList(tags);
+    this.flag = null;
   }
 
   /** Returns the title of the video. */
@@ -29,6 +31,14 @@ class Video implements Comparable<Video>{
   /** Returns a readonly collection of the tags of the video. */
   List<String> getTags() {
     return tags;
+  }
+
+  public String getFlag() {
+    return flag;
+  }
+
+  public void setFlag(String flag) {
+    this.flag = flag;
   }
 
   @Override
