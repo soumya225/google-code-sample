@@ -289,24 +289,7 @@ public class VideoPlayer {
       }
     }
 
-    if(matchingVideos.isEmpty()) {
-      System.out.println("No search results for " + searchTerm);
-      return;
-    }
-
-    System.out.println("Here are the results for " + searchTerm + ":");
-    Collections.sort(matchingVideos);
-    for(int i = 1; i <= matchingVideos.size(); i++) {
-      System.out.println("\t" + i + ") " + matchingVideos.get(i-1));
-    }
-    System.out.println("Would you like to play any of the above? If yes, specify the number of the video.\n" +
-            "If your answer is not a valid number, we will assume it's a no.");
-
-    try {
-      Scanner in = new Scanner(System.in);
-      int choice = in.nextInt();
-      playVideo(matchingVideos.get(choice-1).getVideoId());
-    } catch (Exception ignored) {}
+    processMatches(searchTerm, matchingVideos);
   }
 
   public void searchVideosWithTag(String videoTag) {
@@ -318,24 +301,7 @@ public class VideoPlayer {
       }
     }
 
-    if(matchingVideos.isEmpty()) {
-      System.out.println("No search results for " + videoTag);
-      return;
-    }
-
-    System.out.println("Here are the results for " + videoTag + ":");
-    Collections.sort(matchingVideos);
-    for(int i = 1; i <= matchingVideos.size(); i++) {
-      System.out.println("\t" + i + ") " + matchingVideos.get(i-1));
-    }
-    System.out.println("Would you like to play any of the above? If yes, specify the number of the video.\n" +
-            "If your answer is not a valid number, we will assume it's a no.");
-
-    try {
-      Scanner in = new Scanner(System.in);
-      int choice = in.nextInt();
-      playVideo(matchingVideos.get(choice-1).getVideoId());
-    } catch (Exception ignored) {}
+    processMatches(videoTag, matchingVideos);
   }
 
   public void flagVideo(String videoId) {
@@ -387,5 +353,26 @@ public class VideoPlayer {
       builder.append(" - FLAGGED (reason: ").append(video.getFlag()).append(")");
     }
     System.out.println(builder);
+  }
+
+  private void processMatches(String queryTerm, List<Video> matchingVideos) {
+    if(matchingVideos.isEmpty()) {
+      System.out.println("No search results for " + queryTerm);
+      return;
+    }
+
+    System.out.println("Here are the results for " + queryTerm + ":");
+    Collections.sort(matchingVideos);
+    for(int i = 1; i <= matchingVideos.size(); i++) {
+      System.out.println("\t" + i + ") " + matchingVideos.get(i-1));
+    }
+    System.out.println("Would you like to play any of the above? If yes, specify the number of the video.\n" +
+            "If your answer is not a valid number, we will assume it's a no.");
+
+    try {
+      Scanner in = new Scanner(System.in);
+      int choice = in.nextInt();
+      playVideo(matchingVideos.get(choice-1).getVideoId());
+    } catch (Exception ignored) {}
   }
 }
